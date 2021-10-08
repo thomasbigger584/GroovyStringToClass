@@ -56,7 +56,6 @@ public class StringToClassService {
             for (int index = 0; index < 3; index++) {
                 System.out.println("calling index = " + index);
                 try {
-                    //should this be on a new thread ?
                     ingestionService.execute();
                 } catch (Exception e) {
                     sendErrorEmail(ingestionService, e);
@@ -91,7 +90,7 @@ public class StringToClassService {
         IngestionService service = getIngestionService(fileContent);
 
         ScriptInfo newScriptInfo = service.scriptInfo();
-        int newVersion = newScriptInfo.getVersion();
+        int version = newScriptInfo.getVersion();
         String vendor = newScriptInfo.getVendor();
 
         ConfigurableListableBeanFactory beanFactory = ((ConfigurableApplicationContext) context).getBeanFactory();
@@ -106,7 +105,7 @@ public class StringToClassService {
                 int existingBeanVersion = existingScriptInfo.getVersion();
 
 //                we dont want to overwrite with either the same or old version ?
-                if (newVersion > existingBeanVersion) {
+                if (version > existingBeanVersion) {
 
                     System.out.println("Bean not executing and is a new version, so recreating " + vendor);
                     beanFactory.destroyBean(existingIngestionService);
@@ -131,7 +130,7 @@ public class StringToClassService {
     }
 
 //    read the string as a groovy class, create new instance of IngestionService and initialise it with beans
-//    the beans dont automatically get set with Autowired
+//    note: the beans dont automatically get set with Autowired
     private IngestionService getIngestionService(String fileContent) throws InstantiationException, IllegalAccessException {
         GroovyClassLoader groovyClassLoader = new GroovyClassLoader();
         Class scriptClass = groovyClassLoader.parseClass(fileContent);

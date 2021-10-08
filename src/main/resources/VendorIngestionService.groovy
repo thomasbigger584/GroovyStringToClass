@@ -33,6 +33,7 @@ class VendorIngestionService extends IngestionService {
         return environment.getProperty(ENV_VAR_PROPERTY);
     }
 
+    @Override
     ScriptInfo scriptInfo() {
         return ScriptInfo.builder()
                 .vendor(VENDOR_NAME)
