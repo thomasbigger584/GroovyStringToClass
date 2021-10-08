@@ -52,12 +52,20 @@ public abstract class IngestionService {
 
     public abstract void onExecute() throws Exception;
 
-    public abstract String getVendorName();
+    public abstract ScriptInfo scriptInfo();
 
     @Getter
     @Builder
     public static final class BeanParams {
         private ApplicationContext context;
         private PersistenceFacade persistenceService;
+    }
+
+    @Getter
+    @Builder
+    public static final class ScriptInfo {
+        private String vendor;
+        private String email;
+        private int version;
     }
 }
