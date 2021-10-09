@@ -1,13 +1,10 @@
 import com.twb.stringtoclass.ingestion.IngestionService
 import com.twb.stringtoclass.ingestion.ScriptInfo
 
-@ScriptInfo(vendor = "vendor-name", email = "tbigg@email.com", version = 3)
+@ScriptInfo(vendor = "vendor-name", email = "tbigg@email.com", version = 3, maxTries = 5)
 class VendorIngestionServiceV3 extends IngestionService {
 
-    static final String BUCKET_NAME = "bucket-name"
-    static final String UPLOAD_PATH = "path/to/file/fileName.csv"
     static final String ENV_VAR_PROPERTY = "vendor.property.test"
-    static final long LONG_RUNNING_PROCESS_SLEEP = 5000L
 
     String testProperty
 
@@ -24,11 +21,7 @@ class VendorIngestionServiceV3 extends IngestionService {
         def info = scriptInfo()
         println "vendor = ${info.vendor()}"
 
-        // simulate doing some long process
-        println "sleeping for $LONG_RUNNING_PROCESS_SLEEP ms"
-        Thread.sleep(LONG_RUNNING_PROCESS_SLEEP)
-
-        persistence.persist(BUCKET_NAME, UPLOAD_PATH)
+        throw new Exception("Some error happened in script")
     }
 
     String getTestProperty() {

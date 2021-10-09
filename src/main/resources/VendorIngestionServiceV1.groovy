@@ -1,5 +1,5 @@
-import com.twb.stringtoclass.ingestion.IngestionService
 import com.twb.stringtoclass.ingestion.ScriptInfo
+import com.twb.stringtoclass.ingestion.IngestionService
 
 @ScriptInfo(vendor = "vendor-name", email = "tbigg@email.com", version = 1)
 class VendorIngestionServiceV1 extends IngestionService {

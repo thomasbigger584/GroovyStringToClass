@@ -1,4 +1,4 @@
-package com.twb.stringtoclass.beantest;
+package com.twb.stringtoclass.test;
 
 import com.twb.stringtoclass.StringToClassService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 
 @Service
-public class BeanTestService {
+public class TestService {
     private static final String VENDOR_SERVICE_V1 = "VendorIngestionServiceV1.groovy";
     private static final String VENDOR_SERVICE_V2 = "VendorIngestionServiceV2.groovy";
     private static final String VENDOR_SERVICE_V3 = "VendorIngestionServiceV3.groovy";
@@ -22,17 +22,20 @@ public class BeanTestService {
     private ApplicationContext context;
 
     @PostConstruct
-    public void test() throws Exception {
+    public void test() {
+        System.out.println("BeanTestService.test");
 
-        service.execute(VENDOR_SERVICE_V1);
-        service.execute(VENDOR_SERVICE_V2);
-        service.execute(VENDOR_SERVICE_V3);
+        try {
+            service.execute(VENDOR_SERVICE_V1);
+            service.execute(VENDOR_SERVICE_V2);
+            service.execute(VENDOR_SERVICE_V3);
 
-        System.out.println(service.getIngestionServiceMap());
-        service.getIngestionServiceMap().clear();
-        System.out.println(service.getIngestionServiceMap());
+            System.out.println(service.getIngestionServiceMap());
 
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            service.getIngestionServiceMap().clear();
+        }
     }
-
-
 }

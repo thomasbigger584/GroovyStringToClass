@@ -18,6 +18,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.twb.stringtoclass.factory.RetryTemplateFactory.retryTemplate;
 import static com.twb.stringtoclass.ingestion.IngestionService.BeanParams;
 
 @Component
@@ -55,6 +56,7 @@ public class StringToClassService {
                     ingestionService.init();
                 } catch (Exception e) {
                     sendErrorEmail(ingestionService, e);
+                    e.printStackTrace();
                 }
             }
         } catch (Exception e) {
@@ -64,15 +66,10 @@ public class StringToClassService {
         return ingestionService;
     }
 
-    //given the file content as string, register the bean in the application context
-    //only if its not executing and if its a new version
+    //given the file content as string, register the class, only if its not executing and if it's a new version
     private IngestionService register(String fileContent) throws InstantiationException, IllegalAccessException {
         IngestionService service = getIngestionService(fileContent);
-
         ScriptInfo newScriptInfo = service.scriptInfo();
-        if (newScriptInfo == null) {
-            throw new InstantiationException("No Script Info Found on class");
-        }
 
         int version = newScriptInfo.version();
         String vendor = newScriptInfo.vendor();
@@ -110,16 +107,21 @@ public class StringToClassService {
     private IngestionService getIngestionService(String fileContent) throws InstantiationException, IllegalAccessException {
         GroovyClassLoader groovyClassLoader = new GroovyClassLoader();
         Class scriptClass = groovyClassLoader.parseClass(fileContent);
-        IngestionService ingestionService = (IngestionService) scriptClass.newInstance();
-        ingestionService.setBeans(BeanParams.builder()
+
+        IngestionService service = (IngestionService) scriptClass.newInstance();
+        ScriptInfo scriptInfo = service.scriptInfo();
+
+        service.setBeans(BeanParams.builder()
                 .context(context)
                 .persistenceService(persistenceService)
+                .retryTemplate(retryTemplate(scriptInfo.maxTries()))
                 .build());
-        return ingestionService;
+
+        return service;
     }
 
-    //      if there is anything wrong with the vendors execution they could be sent an email ?
-    private void sendErrorEmail(IngestionService ingestionService, Exception e) {
+    //if there is anything wrong with the vendors execution they could be sent an email ?
+    private void sendErrorEmail(IngestionService ingestionService, Exception e) throws InstantiationException {
         ScriptInfo scriptInfo = ingestionService.scriptInfo();
         String email = scriptInfo.email();
         String exceptionMessage = e.getMessage();

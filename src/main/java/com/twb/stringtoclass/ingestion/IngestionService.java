@@ -6,11 +6,14 @@ import lombok.Getter;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.env.Environment;
+import org.springframework.retry.RetryCallback;
+import org.springframework.retry.RetryOperations;
 
 public abstract class IngestionService {
     protected ApplicationContext context;
     protected Environment environment;
     protected PersistenceFacade persistence;
+    protected RetryOperations retryTemplate;
 
     @Getter
     private boolean initialised = false;
@@ -18,11 +21,11 @@ public abstract class IngestionService {
     @Getter
     private boolean executing = false;
 
-
     public void setBeans(BeanParams beans) {
         this.context = beans.getContext();
         this.environment = this.context.getEnvironment();
         this.persistence = beans.getPersistenceService();
+        this.retryTemplate = beans.getRetryTemplate();
     }
 
     public final void init() throws Exception {
@@ -44,9 +47,14 @@ public abstract class IngestionService {
         }
         executing = true;
         try {
-            onExecute();
+            retryTemplate.execute((RetryCallback<Void, Exception>) retryContext -> {
+                System.out.println("Retry Count " + retryContext.getRetryCount());
+                onExecute();
+                return null;
+            });
         } catch (Exception e) {
-            System.err.println("error on execute = " + e.getMessage());
+            System.err.println("error on execute = " + e);
+            e.printStackTrace();
             throw e;
         } finally {
             executing = false;
@@ -58,8 +66,12 @@ public abstract class IngestionService {
 
     public abstract void onExecute() throws Exception;
 
-    public ScriptInfo scriptInfo() {
-        return AnnotationUtils.findAnnotation(getClass(), ScriptInfo.class);
+    public ScriptInfo scriptInfo() throws InstantiationException {
+        ScriptInfo scriptInfo = AnnotationUtils.findAnnotation(getClass(), ScriptInfo.class);
+        if (scriptInfo == null) {
+            throw new InstantiationException("No Script Info Annotation Found on class");
+        }
+        return scriptInfo;
     }
 
     @Getter
@@ -67,5 +79,6 @@ public abstract class IngestionService {
     public static final class BeanParams {
         private ApplicationContext context;
         private PersistenceFacade persistenceService;
+        private RetryOperations retryTemplate;
     }
 }

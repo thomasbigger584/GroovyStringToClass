@@ -13,4 +13,6 @@ public @interface ScriptInfo {
     String email();
 
     int version();
+
+    int maxTries() default 3;
 }
