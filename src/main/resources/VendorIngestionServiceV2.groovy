@@ -1,10 +1,8 @@
 import com.twb.stringtoclass.ingestion.IngestionService
+import com.twb.stringtoclass.ingestion.ScriptInfo
 
+@ScriptInfo(vendor = "vendor-name", email = "tbigg@email.com", version = 2)
 class VendorIngestionServiceV2 extends IngestionService {
-    static final String VENDOR_NAME = "vendor"
-    static final String EMAIL = "tbigg@email.com"
-    static final int VERSION = 2
-
     static final String BUCKET_NAME = "bucket-name"
     static final String UPLOAD_PATH = "path/to/file/fileName.csv"
     static final String ENV_VAR_PROPERTY = "vendor.property.test"
@@ -32,14 +30,5 @@ class VendorIngestionServiceV2 extends IngestionService {
     String getTestProperty() {
         // private methods seem to throw exception
         return environment.getProperty(ENV_VAR_PROPERTY);
-    }
-
-    @Override
-    ScriptInfo scriptInfo() {
-        return ScriptInfo.builder()
-                .vendor(VENDOR_NAME)
-                .email(EMAIL)
-                .version(VERSION)
-                .build();
     }
 }

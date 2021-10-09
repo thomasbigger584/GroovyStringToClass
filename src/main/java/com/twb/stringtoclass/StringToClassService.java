@@ -1,7 +1,7 @@
 package com.twb.stringtoclass;
 
 import com.twb.stringtoclass.ingestion.IngestionService;
-import com.twb.stringtoclass.ingestion.IngestionService.ScriptInfo;
+import com.twb.stringtoclass.ingestion.ScriptInfo;
 import com.twb.stringtoclass.persist.ScalityPersistenceService;
 import groovy.lang.GroovyClassLoader;
 import lombok.Getter;
@@ -70,8 +70,12 @@ public class StringToClassService {
         IngestionService service = getIngestionService(fileContent);
 
         ScriptInfo newScriptInfo = service.scriptInfo();
-        int version = newScriptInfo.getVersion();
-        String vendor = newScriptInfo.getVendor();
+        if (newScriptInfo == null) {
+            throw new InstantiationException("No Script Info Found on class");
+        }
+
+        int version = newScriptInfo.version();
+        String vendor = newScriptInfo.vendor();
 
         if (ingestionServiceMap.containsKey(vendor)) {
             IngestionService existingIngestionService = ingestionServiceMap.get(vendor);
@@ -79,7 +83,7 @@ public class StringToClassService {
 //          we dont want to interrupt if its already running ?
             if (!existingIngestionService.isExecuting()) {
                 ScriptInfo existingScriptInfo = existingIngestionService.scriptInfo();
-                int existingBeanVersion = existingScriptInfo.getVersion();
+                int existingBeanVersion = existingScriptInfo.version();
 
 //              we dont want to overwrite with either the same or old version ?
                 if (version > existingBeanVersion) {
@@ -117,7 +121,7 @@ public class StringToClassService {
     //      if there is anything wrong with the vendors execution they could be sent an email ?
     private void sendErrorEmail(IngestionService ingestionService, Exception e) {
         ScriptInfo scriptInfo = ingestionService.scriptInfo();
-        String email = scriptInfo.getEmail();
+        String email = scriptInfo.email();
         String exceptionMessage = e.getMessage();
         System.out.printf("Send Email to %s - reason %s", email, exceptionMessage);
     }

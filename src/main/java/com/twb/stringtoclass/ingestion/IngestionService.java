@@ -4,6 +4,7 @@ import com.twb.stringtoclass.persist.PersistenceFacade;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.context.ApplicationContext;
+import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.env.Environment;
 
 public abstract class IngestionService {
@@ -12,10 +13,11 @@ public abstract class IngestionService {
     protected PersistenceFacade persistence;
 
     @Getter
-    private boolean executing = false;
+    private boolean initialised = false;
 
     @Getter
-    private boolean initialised = false;
+    private boolean executing = false;
+
 
     public void setBeans(BeanParams beans) {
         this.context = beans.getContext();
@@ -56,20 +58,14 @@ public abstract class IngestionService {
 
     public abstract void onExecute() throws Exception;
 
-    public abstract ScriptInfo scriptInfo();
+    public ScriptInfo scriptInfo() {
+        return AnnotationUtils.findAnnotation(getClass(), ScriptInfo.class);
+    }
 
     @Getter
     @Builder
     public static final class BeanParams {
         private ApplicationContext context;
         private PersistenceFacade persistenceService;
-    }
-
-    @Getter
-    @Builder
-    public static final class ScriptInfo {
-        private String vendor;
-        private String email;
-        private int version;
     }
 }
