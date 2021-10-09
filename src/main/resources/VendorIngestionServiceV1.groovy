@@ -1,5 +1,5 @@
-import com.twb.stringtoclass.ingestion.ScriptInfo
 import com.twb.stringtoclass.ingestion.IngestionService
+import com.twb.stringtoclass.ingestion.ScriptInfo
 
 @ScriptInfo(vendor = "vendor-name", email = "tbigg@email.com", version = 1)
 class VendorIngestionServiceV1 extends IngestionService {
@@ -13,7 +13,7 @@ class VendorIngestionServiceV1 extends IngestionService {
 
     @Override
     void onInit() {
-        testProperty = getTestProperty();
+        testProperty = getTestProperty()
     }
 
     @Override
@@ -28,11 +28,12 @@ class VendorIngestionServiceV1 extends IngestionService {
         println "sleeping for $LONG_RUNNING_PROCESS_SLEEP ms"
         Thread.sleep(LONG_RUNNING_PROCESS_SLEEP)
 
-        persistence.persist(BUCKET_NAME, UPLOAD_PATH)
+        context.persistenceService.persist(BUCKET_NAME, UPLOAD_PATH)
     }
 
     String getTestProperty() {
         // private methods seem to throw exception
-        return environment.getProperty(ENV_VAR_PROPERTY);
+        return context.applicationContext
+                .environment.getProperty(ENV_VAR_PROPERTY);
     }
 }

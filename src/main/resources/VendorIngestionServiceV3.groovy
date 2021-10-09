@@ -10,7 +10,7 @@ class VendorIngestionServiceV3 extends IngestionService {
 
     @Override
     void onInit() {
-        testProperty = getTestProperty();
+        testProperty = getTestProperty()
     }
 
     @Override
@@ -26,6 +26,7 @@ class VendorIngestionServiceV3 extends IngestionService {
 
     String getTestProperty() {
         // private methods seem to throw exception
-        return environment.getProperty(ENV_VAR_PROPERTY);
+        return context.applicationContext
+                .environment.getProperty(ENV_VAR_PROPERTY);
     }
 }

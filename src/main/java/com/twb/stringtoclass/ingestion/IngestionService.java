@@ -5,15 +5,11 @@ import lombok.Builder;
 import lombok.Getter;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.core.env.Environment;
 import org.springframework.retry.RetryCallback;
 import org.springframework.retry.RetryOperations;
 
 public abstract class IngestionService {
-    protected ApplicationContext context;
-    protected Environment environment;
-    protected PersistenceFacade persistence;
-    protected RetryOperations retryTemplate;
+    protected ScriptContext context;
 
     @Getter
     private boolean initialised = false;
@@ -21,11 +17,8 @@ public abstract class IngestionService {
     @Getter
     private boolean executing = false;
 
-    public void setBeans(BeanParams beans) {
-        this.context = beans.getContext();
-        this.environment = this.context.getEnvironment();
-        this.persistence = beans.getPersistenceService();
-        this.retryTemplate = beans.getRetryTemplate();
+    public void setScriptContext(ScriptContext context) {
+        this.context = context;
     }
 
     public final void init() throws Exception {
@@ -47,6 +40,7 @@ public abstract class IngestionService {
         }
         executing = true;
         try {
+            RetryOperations retryTemplate = context.getRetryTemplate();
             retryTemplate.execute((RetryCallback<Void, Exception>) retryContext -> {
                 System.out.println("Retry Count " + retryContext.getRetryCount());
                 onExecute();
@@ -66,7 +60,7 @@ public abstract class IngestionService {
 
     public abstract void onExecute() throws Exception;
 
-    public ScriptInfo scriptInfo() throws InstantiationException {
+    public final ScriptInfo scriptInfo() throws InstantiationException {
         ScriptInfo scriptInfo = AnnotationUtils.findAnnotation(getClass(), ScriptInfo.class);
         if (scriptInfo == null) {
             throw new InstantiationException("No Script Info Annotation Found on class");
@@ -76,8 +70,8 @@ public abstract class IngestionService {
 
     @Getter
     @Builder
-    public static final class BeanParams {
-        private ApplicationContext context;
+    public static final class ScriptContext {
+        private ApplicationContext applicationContext;
         private PersistenceFacade persistenceService;
         private RetryOperations retryTemplate;
     }

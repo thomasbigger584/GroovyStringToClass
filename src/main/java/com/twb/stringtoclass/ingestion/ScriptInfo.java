@@ -14,5 +14,5 @@ public @interface ScriptInfo {
 
     int version();
 
-    int maxTries() default 3;
+    int maxTries() default 1;
 }

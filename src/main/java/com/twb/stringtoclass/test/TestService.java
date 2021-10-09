@@ -12,8 +12,6 @@ public class TestService {
     private static final String VENDOR_SERVICE_V1 = "VendorIngestionServiceV1.groovy";
     private static final String VENDOR_SERVICE_V2 = "VendorIngestionServiceV2.groovy";
     private static final String VENDOR_SERVICE_V3 = "VendorIngestionServiceV3.groovy";
-    private static final String BEAN_NAME = "vendor";
-    private static final String LINE = "\n----------------------------------";
 
     @Autowired
     private StringToClassService service;
@@ -34,8 +32,6 @@ public class TestService {
 
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            service.getIngestionServiceMap().clear();
         }
     }
 }

@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.twb.stringtoclass.factory.RetryTemplateFactory.retryTemplate;
-import static com.twb.stringtoclass.ingestion.IngestionService.BeanParams;
+import static com.twb.stringtoclass.ingestion.IngestionService.ScriptContext;
 
 @Component
 public class StringToClassService {
@@ -111,8 +111,9 @@ public class StringToClassService {
         IngestionService service = (IngestionService) scriptClass.newInstance();
         ScriptInfo scriptInfo = service.scriptInfo();
 
-        service.setBeans(BeanParams.builder()
-                .context(context)
+        //can this be set via a constructor?
+        service.setScriptContext(ScriptContext.builder()
+                .applicationContext(context)
                 .persistenceService(persistenceService)
                 .retryTemplate(retryTemplate(scriptInfo.maxTries()))
                 .build());
