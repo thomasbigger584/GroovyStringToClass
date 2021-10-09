@@ -12,10 +12,10 @@ public abstract class IngestionService {
     protected PersistenceFacade persistence;
 
     @Getter
-    private boolean isExecuting = false;
+    private boolean executing = false;
 
     @Getter
-    private boolean hasInitialised = false;
+    private boolean initialised = false;
 
     public void setBeans(BeanParams beans) {
         this.context = beans.getContext();
@@ -27,7 +27,7 @@ public abstract class IngestionService {
         System.out.println("IngestionService.init");
         try {
             onInit();
-            hasInitialised = true;
+            initialised = true;
         } catch (Exception e) {
             System.err.println("error on initialising = " + e.getMessage());
             throw e;
@@ -36,14 +36,18 @@ public abstract class IngestionService {
 
     public final void execute() throws Exception {
         System.out.println("IngestionService.execute");
-        isExecuting = true;
+        if (isExecuting()) {
+            System.out.println("IngestionService already executing...");
+            return;
+        }
+        executing = true;
         try {
             onExecute();
         } catch (Exception e) {
             System.err.println("error on execute = " + e.getMessage());
             throw e;
         } finally {
-            isExecuting = false;
+            executing = false;
         }
     }
 

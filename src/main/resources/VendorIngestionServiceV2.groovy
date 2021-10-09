@@ -1,9 +1,9 @@
 import com.twb.stringtoclass.ingestion.IngestionService
 
-class VendorIngestionService extends IngestionService {
+class VendorIngestionServiceV2 extends IngestionService {
     static final String VENDOR_NAME = "vendor"
     static final String EMAIL = "tbigg@email.com"
-    static final int VERSION = 1
+    static final int VERSION = 2
 
     static final String BUCKET_NAME = "bucket-name"
     static final String UPLOAD_PATH = "path/to/file/fileName.csv"
@@ -19,10 +19,11 @@ class VendorIngestionService extends IngestionService {
 
     @Override
     void onExecute() throws Exception {
-        println "VendorIngestionService.onExecute"
+        println "VendorIngestionService.onExecute version 2"
         println "testProperty = $testProperty"
 
         // simulate doing some long process
+        println "sleeping for $LONG_RUNNING_PROCESS_SLEEP ms"
         Thread.sleep(LONG_RUNNING_PROCESS_SLEEP)
 
         persistence.persist(BUCKET_NAME, UPLOAD_PATH)
