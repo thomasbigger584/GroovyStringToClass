@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-@Component
+//@Component
 public class IngestionInitializer {
     private static final String VENDOR_SERVICE_V1 = "VendorIngestionServiceV1.groovy";
     private static final String VENDOR_SERVICE_V2 = "VendorIngestionServiceV2.groovy";
@@ -23,10 +23,10 @@ public class IngestionInitializer {
     private static final List<String> GITHUB_FILE_LIST
             = Arrays.asList(VENDOR_SERVICE_V1, VENDOR_SERVICE_V2, VENDOR_SERVICE_V3);
 
-    @Autowired
+//    @Autowired
     private IngestionConfig ingestionConfig;
 
-    @Scheduled(fixedDelay = 1000)
+//    @Scheduled(fixedDelay = 1000)
     public void run() {
         try {
             List<String> githubScriptFiles = getGithubFiles();

@@ -7,13 +7,13 @@ import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
-@Component
+//@Component
 public class IngestionScheduler {
 
-    @Autowired
+//    @Autowired
     private IngestionConfig ingestionConfig;
 
-    @Scheduled(fixedRate = 10000)
+//    @Scheduled(fixedRate = 10000)
     public void run() {
         Map<String, IngestionService> registeredServices
                 = ingestionConfig.getRegisteredServices();
