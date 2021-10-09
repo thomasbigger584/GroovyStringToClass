@@ -1,4 +1,4 @@
-package com.twb.stringtoclass.factory;
+package com.twb.stringtoclass.config.factory;
 
 import org.springframework.retry.backoff.FixedBackOffPolicy;
 import org.springframework.retry.policy.SimpleRetryPolicy;

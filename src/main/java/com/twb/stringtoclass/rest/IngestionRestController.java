@@ -2,6 +2,7 @@ package com.twb.stringtoclass.rest;
 
 import com.twb.stringtoclass.config.IngestionConfig;
 import com.twb.stringtoclass.ingestion.IngestionService;
+import com.twb.stringtoclass.config.helper.IngestionHandler;
 import org.eclipse.xtend.lib.annotations.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,9 @@ public class IngestionRestController {
     @Autowired
     private IngestionConfig ingestionConfig;
 
+    @Autowired
+    private IngestionHandler handler;
+
     @PostMapping("/add-service")
     public void addService(@RequestBody AddServiceRequest addServiceRequest) {
         String fileContentBase64 = addServiceRequest.getFileContentBase64();
@@ -31,7 +35,7 @@ public class IngestionRestController {
         Map<String, IngestionService> registeredServices = ingestionConfig.getRegisteredServices();
         if (registeredServices.containsKey(name)) {
             IngestionService ingestionService = registeredServices.get(name);
-            ingestionService.execute();
+            handler.execute(ingestionService);
             return ResponseEntity.ok("Service Executed");
         } else {
             throw new Exception("Service with name " + name + " not found");
