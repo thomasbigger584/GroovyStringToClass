@@ -8,21 +8,22 @@ import org.springframework.retry.RetryContext;
 import org.springframework.retry.RetryOperations;
 
 public interface IngestionService {
-    void init(ScriptContext context);
+    default void init(ScriptContext context) { }
+
     void execute(ScriptContext context, ExecuteParams params);
 
     @Getter
     @Builder
     final class ScriptContext {
-        private ScriptInfo scriptInfo;
-        private ApplicationContext applicationContext;
-        private PersistenceFacade persistenceService;
-        private RetryOperations retryTemplate;
+        private final ScriptInfo scriptInfo;
+        private final ApplicationContext applicationContext;
+        private final PersistenceFacade persistenceService;
+        private final RetryOperations retryTemplate;
     }
 
     @Getter
     @Builder
     final class ExecuteParams {
-        private RetryContext retryContext;
+        private final RetryContext retryContext;
     }
 }
