@@ -1,6 +1,6 @@
 package com.twb.stringtoclass.rest;
 
-import com.twb.stringtoclass.config.ingestion.IngestionConfig;
+import com.twb.stringtoclass.config.IngestionConfig;
 import com.twb.stringtoclass.ingestion.IngestionService;
 import org.eclipse.xtend.lib.annotations.Data;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,11 +20,9 @@ public class IngestionRestController {
     @PostMapping("/add-service")
     public void addService(@RequestBody AddServiceRequest addServiceRequest) {
         String fileContentBase64 = addServiceRequest.getFileContentBase64();
-        System.out.println("addServiceRequest = " + fileContentBase64);
         byte[] decodedBytes = Base64.getUrlDecoder().decode(fileContentBase64);
         String fileContent = new String(decodedBytes);
-
-        System.out.println("fileContent = " + fileContent);
+        System.out.println("adding service:\n" + fileContent);
         ingestionConfig.addService(fileContent);
     }
 

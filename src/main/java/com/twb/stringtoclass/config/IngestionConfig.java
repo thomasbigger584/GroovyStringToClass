@@ -1,4 +1,4 @@
-package com.twb.stringtoclass.config.ingestion;
+package com.twb.stringtoclass.config;
 
 import com.twb.stringtoclass.factory.IngestionServiceFactory;
 import com.twb.stringtoclass.ingestion.IngestionService;
