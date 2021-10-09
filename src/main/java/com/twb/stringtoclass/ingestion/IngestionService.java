@@ -17,12 +17,12 @@ public abstract class IngestionService {
     @Getter
     private boolean executing = false;
 
-    public void setScriptContext(ScriptContext context) {
-        this.context = context;
-    }
-
     public final void init() throws Exception {
         System.out.println("IngestionService.init");
+        if (context == null) {
+            throw new InstantiationException("Something has gone wrong, " +
+                    "the script context is null");
+        }
         try {
             onInit();
             initialised = true;

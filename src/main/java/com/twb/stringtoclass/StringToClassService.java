@@ -1,13 +1,11 @@
 package com.twb.stringtoclass;
 
+import com.twb.stringtoclass.factory.IngestionServiceFactory;
 import com.twb.stringtoclass.ingestion.IngestionService;
 import com.twb.stringtoclass.ingestion.ScriptInfo;
-import com.twb.stringtoclass.persist.ScalityPersistenceService;
-import groovy.lang.GroovyClassLoader;
 import lombok.Getter;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
@@ -18,16 +16,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.twb.stringtoclass.factory.RetryTemplateFactory.retryTemplate;
-import static com.twb.stringtoclass.ingestion.IngestionService.ScriptContext;
-
 @Component
 public class StringToClassService {
-    @Autowired
-    private ApplicationContext context;
 
     @Autowired
-    private ScalityPersistenceService persistenceService;
+    private IngestionServiceFactory factory;
 
     @Getter
     private Map<String, IngestionService> ingestionServiceMap = new HashMap<>();
@@ -68,7 +61,7 @@ public class StringToClassService {
 
     //given the file content as string, register the class, only if its not executing and if it's a new version
     private IngestionService register(String fileContent) throws InstantiationException, IllegalAccessException {
-        IngestionService service = getIngestionService(fileContent);
+        IngestionService service = factory.getService(fileContent);
         ScriptInfo newScriptInfo = service.scriptInfo();
 
         int version = newScriptInfo.version();
@@ -100,25 +93,6 @@ public class StringToClassService {
             ingestionServiceMap.put(vendor, service);
             return service;
         }
-    }
-
-    //    read the string as a groovy class, create new instance of IngestionService and initialise it with beans
-    //    note: the beans dont automatically get set with Autowired
-    private IngestionService getIngestionService(String fileContent) throws InstantiationException, IllegalAccessException {
-        GroovyClassLoader groovyClassLoader = new GroovyClassLoader();
-        Class scriptClass = groovyClassLoader.parseClass(fileContent);
-
-        IngestionService service = (IngestionService) scriptClass.newInstance();
-        ScriptInfo scriptInfo = service.scriptInfo();
-
-        //can this be set via a constructor?
-        service.setScriptContext(ScriptContext.builder()
-                .applicationContext(context)
-                .persistenceService(persistenceService)
-                .retryTemplate(retryTemplate(scriptInfo.maxTries()))
-                .build());
-
-        return service;
     }
 
     //if there is anything wrong with the vendors execution they could be sent an email ?
