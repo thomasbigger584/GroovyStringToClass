@@ -1,7 +1,7 @@
 import com.twb.stringtoclass.ingestion.IngestionService
 import com.twb.stringtoclass.ingestion.ScriptInfo
 
-@ScriptInfo(vendor = "vendor-name", email = "tbigg@email.com", version = 1)
+@ScriptInfo(name = "vendor-name", email = "tbigg@email.com", version = 1)
 class VendorIngestionServiceV1 extends IngestionService {
 
     static final String BUCKET_NAME = "bucket-name"
@@ -17,12 +17,13 @@ class VendorIngestionServiceV1 extends IngestionService {
     }
 
     @Override
-    void onExecute() throws Exception {
-        println "VendorIngestionService.onExecute version 1"
+    void onExecute(ExecuteParams params) throws Exception {
+        def tryCount = params.retryContext.retryCount + 1
+        println "VendorIngestionServiceV1.onExecute try count - $tryCount"
         println "testProperty = $testProperty"
 
         def info = scriptInfo()
-        println "vendor = ${info.vendor()}"
+        println "name = ${info.name()}"
 
         // simulate doing some long process
         println "sleeping for $LONG_RUNNING_PROCESS_SLEEP ms"
@@ -32,7 +33,6 @@ class VendorIngestionServiceV1 extends IngestionService {
     }
 
     String getTestProperty() {
-        // private methods seem to throw exception
         return context.applicationContext
                 .environment.getProperty(ENV_VAR_PROPERTY);
     }

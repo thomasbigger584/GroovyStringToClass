@@ -6,6 +6,7 @@ import lombok.Getter;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.retry.RetryCallback;
+import org.springframework.retry.RetryContext;
 import org.springframework.retry.RetryOperations;
 
 public abstract class IngestionService {
@@ -42,8 +43,9 @@ public abstract class IngestionService {
         try {
             RetryOperations retryTemplate = context.getRetryTemplate();
             retryTemplate.execute((RetryCallback<Void, Exception>) retryContext -> {
-                System.out.println("Retry Count " + retryContext.getRetryCount());
-                onExecute();
+                onExecute(ExecuteParams.builder()
+                        .retryContext(retryContext)
+                        .build());
                 return null;
             });
         } catch (Exception e) {
@@ -58,7 +60,7 @@ public abstract class IngestionService {
     public void onInit() throws Exception {
     }
 
-    public abstract void onExecute() throws Exception;
+    public abstract void onExecute(ExecuteParams params) throws Exception;
 
     public final ScriptInfo scriptInfo() throws InstantiationException {
         ScriptInfo scriptInfo = AnnotationUtils.findAnnotation(getClass(), ScriptInfo.class);
@@ -74,5 +76,11 @@ public abstract class IngestionService {
         private ApplicationContext applicationContext;
         private PersistenceFacade persistenceService;
         private RetryOperations retryTemplate;
+    }
+
+    @Getter
+    @Builder
+    public static final class ExecuteParams {
+        private RetryContext retryContext;
     }
 }
